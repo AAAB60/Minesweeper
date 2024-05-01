@@ -1,4 +1,4 @@
-﻿#include <stdio.h>
+#include <stdio.h>
 #include <windows.h>
 #include <pthread.h>
 #include <time.h>
@@ -237,6 +237,7 @@ int main() {
     //初始化
     start = clock();
     hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    setCursorBlink(0);
 
     //禁用最大化按钮
     {
@@ -249,15 +250,11 @@ int main() {
     }
 
 
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-
-    setCursorBlink(0);
     HANDLE hConsoleInput;
+    hConsoleInput = GetStdHandle(STD_INPUT_HANDLE);
     DWORD fdwMode;
     INPUT_RECORD irInBuf;
     DWORD cNumRead;
-    // 获取标准输入句柄
-    hConsoleInput = GetStdHandle(STD_INPUT_HANDLE);
     // 设置输入模式
     GetConsoleMode(hConsoleInput, &fdwMode);
     SetConsoleMode(hConsoleInput, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS);
@@ -305,7 +302,8 @@ int main() {
     memset(mines, 0, sizeof(mines));
     // summon mine
     srand(0xAAAB60);
-    for (int i = 0; i < dif_ind; i++) {
+    int loopNum = dif_ind * dif_ind / 9;
+    for (int i = 0; i < loopNum; i++) {
         COORD pos = { rand() % dif_ind,rand() % dif_ind };
         while (mines[pos.X][pos.Y]) {
             pos.X = (short)(rand() % dif_ind);
@@ -439,6 +437,7 @@ int main() {
                             pos.Y--;
                             if (pos.X >= 0 && pos.X <= dif_ind && pos.Y >= 0 && pos.Y <= dif_ind && cover[pos.X][pos.Y]) {
                                 if (mines[pos.X][pos.Y] == 'm') {
+                                    cover[pos.X][pos.Y] = 0;
                                     // game over
                                     stop = 1;
                                     if (pthread_join(thread_timer, NULL) != 0) {
