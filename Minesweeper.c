@@ -301,9 +301,11 @@ int main() {
     memset(cover, 1, sizeof(cover));
     memset(mines, 0, sizeof(mines));
     // summon mine
-    srand(0xAAAB60);
-    int loopNum = dif_ind * dif_ind / 9;
-    for (int i = 0; i < loopNum; i++) {
+    srand(time(NULL));
+    //srand(0xaaab60);
+    int mineNum = dif_ind * dif_ind / 9;
+    coverCount = dif_ind * dif_ind - mineNum;
+    for (int i = 0; i < mineNum; i++) {
         COORD pos = { rand() % dif_ind,rand() % dif_ind };
         while (mines[pos.X][pos.Y]) {
             pos.X = (short)(rand() % dif_ind);
@@ -368,7 +370,6 @@ int main() {
     drawBox(pos1, pos2, 0x70);
     printTopBar(dif_ind);
 
-    coverCount = dif_ind * (dif_ind - 1);
     //print main
     pthread_mutex_lock(&mutex); // 上锁，防止其他线程访问共享资源
     setConsoleTextColor(0xb0);
@@ -383,7 +384,6 @@ int main() {
     pthread_mutex_unlock(&mutex); // 解锁
 
     int score = 0;
-    int mineCount = dif_ind;
     if (pthread_create(&thread_timer, NULL, changeTime, NULL)) {
         fprintf(stderr, "Failed to create timer thread\n");
         return 1;
@@ -449,6 +449,7 @@ int main() {
                                     COORD position = { 0,0 };
                                     SetConsoleCursorPosition(hConsole, position);
                                     printf("game over");
+                                    break;
                                 }
                                 else {
                                     RELATE_POS position = { (char)(pos.X), (char)(pos.Y) };
