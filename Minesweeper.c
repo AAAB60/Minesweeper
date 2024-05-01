@@ -410,7 +410,7 @@ int main() {
                     pthread_mutex_unlock(&mutex); // 解锁
                     doLastPos = 0;
                 }
-                if (pos_related.X >= 0 && pos_related.X <= dif_ind && pos_related.Y >= 0 && pos_related.Y <= dif_ind && cover[pos_related.X][pos_related.Y]) {
+                if (pos_related.X >= 0 && pos_related.X < dif_ind && pos_related.Y >= 0 && pos_related.Y < dif_ind && cover[pos_related.X][pos_related.Y]) {
 					pthread_mutex_lock(&mutex); // 上锁，防止其他线程访问共享资源
 					SetConsoleCursorPosition(hConsole, pos);
 					setConsoleTextColor(0x93);
@@ -435,7 +435,7 @@ int main() {
                             COORD pos = irInBuf.Event.MouseEvent.dwMousePosition;
                             pos.X = (pos.X - 1) / 2;
                             pos.Y--;
-                            if (pos.X >= 0 && pos.X <= dif_ind && pos.Y >= 0 && pos.Y <= dif_ind && cover[pos.X][pos.Y]) {
+                            if (pos.X >= 0 && pos.X < dif_ind && pos.Y >= 0 && pos.Y < dif_ind && cover[pos.X][pos.Y]) {
                                 if (mines[pos.X][pos.Y] == 'm') {
                                     cover[pos.X][pos.Y] = 0;
                                     // game over
@@ -456,6 +456,17 @@ int main() {
                                 }
                             }
                         }
+                        else {
+                            lastPos.X = lastPos.X - (lastPos.X & 1 ^ 1);
+                            pthread_mutex_lock(&mutex); // 上锁，防止其他线程访问共享资源
+                            SetConsoleCursorPosition(hConsole, lastPos);
+                            setConsoleTextColor(0xb0);
+                            if (cover[(lastPos.X - 1) / 2][lastPos.Y - 1] == 1)
+                                printf("%c ", 1);
+                            else
+                                printf("旗");
+                            pthread_mutex_unlock(&mutex); // 解锁
+                        }
                         break;
                     }
                 }
@@ -472,7 +483,7 @@ int main() {
                             COORD pos = irInBuf.Event.MouseEvent.dwMousePosition;
                             pos.X = (pos.X - 1) / 2;
                             pos.Y--;
-                            if (pos.X >= 0 && pos.X <= dif_ind && pos.Y >= 0 && pos.Y <= dif_ind && cover[pos.X][pos.Y]) {
+                            if (pos.X >= 0 && pos.X < dif_ind && pos.Y >= 0 && pos.Y < dif_ind && cover[pos.X][pos.Y]) {
                                 if (cover[pos.X][pos.Y] == 1){
                                     cover[pos.X][pos.Y] = 2;
                                     // print num
@@ -494,6 +505,17 @@ int main() {
                                     pthread_mutex_unlock(&mutex); // 解锁
                                 }
                             }
+                        }
+                        else {
+                            lastPos.X = lastPos.X - (lastPos.X & 1 ^ 1);
+                            pthread_mutex_lock(&mutex); // 上锁，防止其他线程访问共享资源
+                            SetConsoleCursorPosition(hConsole, lastPos);
+                            setConsoleTextColor(0xb0);
+                            if (cover[(lastPos.X - 1) / 2][lastPos.Y - 1] == 1)
+                                printf("%c ", 1);
+                            else
+                                printf("旗");
+                            pthread_mutex_unlock(&mutex); // 解锁
                         }
                         break;
                     }
